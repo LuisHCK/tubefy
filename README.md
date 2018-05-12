@@ -19,3 +19,11 @@ npm run build --report
 ```
 
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+## TODO
+- [x] Youtube Playlist Import by URL
+- [x] Store playlists on IndexedDB
+- [ ] Volume Controls
+- [ ] Single video Import
+- [ ] Document JS code
+- [ ] Better UI Responsiveness
