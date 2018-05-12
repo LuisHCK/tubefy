@@ -1,5 +1,5 @@
 <template>
-<nav class="navbar">
+<nav class="navbar is-dark">
       <div class="navbar-brand">
         <a class="navbar-item" href="/">
           <img src="https://s3.us-east-2.amazonaws.com/elasticbeanstalk-us-east-2-937989723734/assets/apple-touch-icon.png" alt="Logo">
@@ -18,14 +18,14 @@
     -->
       <div class="navbar-menu" :class="{ 'is-active': showNav }">
         <div class="navbar-end">
-          <a class="navbar-item" href="/about">
+          <a class="navbar-item" target="_blank" href="https://luishck.github.io/">
             About
           </a>
-          <a class="navbar-item" href="/path">
-            Path
-          </a>
-          <a class="navbar-item" href="/blog">
+          <a class="navbar-item" target="_blank" href="https://luishck.github.io/posts/">
             Blog
+          </a>
+          <a class="navbar-item" target="_blank" href="https://github.com/LuisHCK/tubefy">
+            Fork me on GitHub ❤
           </a>
         </div>
       </div>
@@ -47,6 +47,9 @@ export default {
   },
 
   methods: {
+    /**
+     * Show or hide Navbar
+     */
     toggleNav() {
       this.$store.commit('toggleNav')
     }
@@ -54,10 +57,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 nav {
   min-height: 42px;
-  background-color: #37474F;
 }
 .navbar-burger {
   color: white;
