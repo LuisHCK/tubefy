@@ -32,7 +32,7 @@ body {
 }
 
 .flat {
-  background-color: transparent;
-  border: none;
+  background-color: transparent !important;
+  border: none !important;
 }
 </style>
