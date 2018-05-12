@@ -5,7 +5,9 @@ Vue.use(Vuex)
 
 const state = {
   playlists: [],
-  currentPlaylist: [],
+  currentPlaylist: {
+    songs: []
+  },
   currentSong: {
     title: 'Select a song',
     videoId: ''
