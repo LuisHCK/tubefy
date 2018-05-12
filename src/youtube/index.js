@@ -1,5 +1,6 @@
 import axios from 'axios'
 import db from '../database/'
+import store from '../store/'
 
 const API_KEY = 'AIzaSyAJ1-y_cXzOzjWUUFYRBur1kA-0JNQQias'
 
@@ -50,11 +51,17 @@ export default class Youtube {
       })
     })
 
-    db.playlists.add({
+    const playlist = {
       title: title,
       songs: songs
-    }).then(() => {
+    }
+
+    db.playlists.add(playlist).then(() => {
       alert('Playlist created successfully')
+      // Update Vuex store state
+      db.playlists.toArray().then(lists => {
+        store.commit('setPlaylists', lists)
+      })
     })
   }
 
