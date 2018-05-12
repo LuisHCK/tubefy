@@ -11,6 +11,8 @@
       <youtube
         :player-vars="playerVars"
         :video-id="currentSong.videoId"
+        width="auto"
+        height="200px"
         ref="youtube"
         @paused="paused"
         @playing="playing"
@@ -68,6 +70,9 @@ export default {
   },
 
   methods: {
+    /**
+     * Reset vars and play the selected video
+     */
     playVideo() {
       this.duration = 0
       this.progress = 0
@@ -75,6 +80,10 @@ export default {
       this.player.playVideo()
     },
 
+    /**
+     * When ins playing get the duration of video and
+     * set the interval of update of current time
+     */
     async playing() {
       let totalTime = await this.player.getDuration()
 
@@ -88,6 +97,9 @@ export default {
       }, 100)
     },
 
+    /**
+     * Get the current minute and second of video
+     */
     updateTime(time) {
       time = Math.round(time)
       let minutes = Math.floor(time / 60)
@@ -113,27 +125,32 @@ export default {
      * or next button is pressed
      */
     nextSong() {
-      let song = this.currentPlaylist.songs[this.currentSongIndex+1]
-      this.$store.commit(
-        'playSong',
-        song
-      )
+      this.paused()
+      let song = this.currentPlaylist.songs[this.currentSongIndex + 1]
+      this.$store.commit('playSong', song)
       // Update index
-      this.$store.commit('setCurrentSongIndex', this.currentSongIndex+1)
+      this.$store.commit('setCurrentSongIndex', this.currentSongIndex + 1)
     },
 
     /**
      * Check if any currentPlaylist
      */
     checkCurrentPlaylist() {
-      if (this.currentPlaylist.length < 1) {
-        db.playlists.toArray(values => {
-          let last = values.length - 1
-          if (values.length >= 0) {
-            this.$store.commit('setCurrentPlaylist', values[last])
+      db.playlists.toArray(dbPlaylists => {
+        // First check if theres one current playlist
+        if (this.currentPlaylist.length < 1) {
+          let last = dbPlaylists.length - 1
+          // If theres more than one playlist in db
+          // set the last as current
+          if (dbPlaylists.length >= 0) {
+            this.$store.commit('setCurrentPlaylist', dbPlaylists[last])
           }
-        })
-      }
+        } else {
+          // If not, set the unique as current
+          if (dbPlaylists && dbPlaylists.length > 0)
+            this.$store.commit('setCurrentPlaylist', dbPlaylists[0])
+        }
+      })
     }
   },
 
@@ -154,7 +171,7 @@ footer {
   bottom: 0;
   right: 0;
   overflow: hidden;
-  background-color: #607D8B;
+  background-color: #607d8b;
   color: white;
 }
 
@@ -162,7 +179,8 @@ footer {
   display: none;
 }
 
-.player-buttons, .song-info {
+.player-buttons,
+.song-info {
   text-align: center;
 }
 </style>
