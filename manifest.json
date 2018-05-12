@@ -3,7 +3,7 @@
   "version": "1.0",
   "name": "tubefy",
   "short_name": "TubeFy",
-  "start_url": "/index.html",
+  "start_url": "https://luishck.github.io/tubefy",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#4DBA87",
