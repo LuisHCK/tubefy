@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "version": "1.0",
+  "name": "tubefy",
+  "short_name": "TubeFy",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#4DBA87",
+
+  "sidebar_action": {
+    "default_icon": "/static/img/icons/favicon-32x32.png",
+    "default_title": "Tubefy",
+    "default_panel": "index.html"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "tubefy",
+  "short_name": "TubeFy",
+  "icons": [
+    {
+      "src": "/static/img/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/img/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#4DBA87",
+
+  "sidebar_action": {
+    "default_icon": "/static/img/icons/favicon-32x32.png",
+    "default_title": "Tubefy",
+    "default_panel": "index.html"
+  }
+}
