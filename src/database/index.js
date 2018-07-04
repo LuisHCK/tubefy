@@ -2,7 +2,7 @@ import Dexie from 'dexie';
 
 const db = new Dexie('wrkstation');
 db.version(1).stores({
-    videos: `++id, name, url, favorite`,
+    songs: `++id, name, url, favorite`,
     playlists: '++id, title, *songs'
 });
 

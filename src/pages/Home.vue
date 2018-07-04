@@ -1,42 +1,31 @@
 <template>
   <div class="home-page">
-    <Header />
-    <div class="container">
-      <button class="button is-rounded is-primary" @click="showForm=!showForm">Add new Playlist</button>
-      <v-form v-if="showForm">
-        <div class="field">
-          <div class="control">
-            <input class="input is-primary" placeholder="Youtube Playlist URL" type="text" v-model="playlistId">
-          </div>
-        </div>
-        <div class="field">
-          <div class="control">
-            <input class="input is-primary" type="text" placeholder="Playlist Title" v-model="playlistTitle">
-          </div>
-        </div>
-        <button class="button is-success is-rounded" @click="createPlaylist()">Get Playlist</button>
-      </v-form>
-    </div>
+    <h1 class="title is-1">Library</h1>
 
-    <div class="container">
-      <Playlist />
+    <div class="columns is-mobile is-multiline playlists-container">
+      <div class="column is-2-desktop is-4-tablet is-half-mobile" v-for="(item, index) in playlists" :key="index">
+        <PlaylistItem :title="item.title || 'Hello world'" :id="item.id"/>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import Header from '../components/layout/Header'
-import Playlist from '../components/player/Playlist'
+import PlaylistItem from '../components/player/PlaylistItem.vue'
 import Youtube from '../youtube/'
 import db from '../database/'
+import { mapState } from 'vuex'
 
 const youtube = new Youtube()
 
 export default {
   components: {
-    Header: Header,
-    Playlist: Playlist
+    PlaylistItem: PlaylistItem
   },
+
+  computed: mapState({
+    playlists: state => state.playlists,
+  }),
 
   data() {
     return {
