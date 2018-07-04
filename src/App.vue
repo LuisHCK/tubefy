@@ -19,7 +19,7 @@
 <script>
 import Player from "./components/player/Player.vue";
 import Sidebar from "./components/layout/Sidebar.vue";
-import Header from './components/layout/Header.vue'
+import Header from "./components/layout/Header.vue";
 
 export default {
   components: {
@@ -42,6 +42,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
 }
 
 .flat {

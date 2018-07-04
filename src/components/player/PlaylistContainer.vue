@@ -3,10 +3,13 @@
     <ul class="playlist-song-list">
       <li class="playlist-song"
       v-for="(item, index) in items" :key="index"
-      :class="{selected: selectedSong == index}"
-      @click="selectedSong = index">
-        <i class="icon song">S</i>
-        <span>{{ item }}</span>
+      :class="{selected: currentVideoId == item.videoId}"
+      @click="selectSong(item)">
+        <span class="icon has-text-info">
+          <i class="icon ion-md-play" v-if="currentVideoId == item.videoId"></i>
+          <i class="icon ion-md-musical-notes" v-else></i>
+        </span>
+        <span>{{ item.title }}</span>
       </li>
     </ul>
   </div>
@@ -16,19 +19,39 @@
 import { mapState } from "vuex";
 
 export default {
+  computed: mapState({
+    currentVideoId: state => state.currentVideoId
+  }),
+
   props: {
     items: {}
   },
 
-  data() {
-    return {
-      selectedSong: undefined
+  methods: {
+    selectSong(song) {
+      // Set song
+      this.$store.commit('setCurrentVideoId', song.videoId);
+      this.setQueue()
+    },
+
+    setQueue() {
+      // Get only video ids
+      let videoIds = []
+      this.items.map(item => {
+        videoIds.push(item.videoId)
+      })
+      // Set queue
+      this.$store.commit('setQueue', videoIds)
     }
   }
 };
 </script>
 
 <style scoped lang="scss">
+.playlist-container {
+  overflow-y: scroll;
+  height: 50vh;
+}
 .playlist-song-list {
   li.playlist-song {
     padding: 10px;

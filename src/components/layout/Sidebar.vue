@@ -2,13 +2,15 @@
   <div class="sidebar">
     <ul class="sidebar-item-list" @click="$router.push('/')">
       <li class="sidebar-item">
-        <i class="icon">i</i>
+        <span class="icon">
+          <i class="icon ion-ios-list"></i>
+        </span>
         <span>Library</span>
       </li>
-      <li class="sidebar-item" @click="seedPlaylists()">
+      <!-- <li class="sidebar-item" @click="seedPlaylists()">
         <i class="icon">s</i>
         <span>Seed</span>
-      </li>
+      </li> -->
     </ul>
   </div>
 </template>
@@ -29,6 +31,7 @@ export default {
 .sidebar {
   background-color: #363636;
   color: white;
+  height: 80vh;
 
   .sidebar-item-list {
     .sidebar-item {

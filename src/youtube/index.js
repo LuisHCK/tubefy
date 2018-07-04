@@ -5,18 +5,18 @@ import store from '../store/'
 const API_KEY = 'AIzaSyAJ1-y_cXzOzjWUUFYRBur1kA-0JNQQias'
 
 const Axios = axios.create({
-  baseURL: 'https://www.googleapis.com/youtube/v3/playlistItems',
+  baseURL: 'https://www.googleapis.com/youtube/v3/',
 })
 
 const FIELDS = "items(contentDetails/videoId,id,snippet(resourceId/videoId,title)),nextPageToken,pageInfo,prevPageToken,tokenPagination"
 
 export default class Youtube {
   constructor() {
-    this.playListTiems = []
+    this.playlistItems = []
   }
 
-  getPlaylistItems(playlistId, nextPage = undefined, title = undefined) {
-    Axios.get('', {
+  getPlaylistItems(playlistId, nextPage = undefined, title = undefined, cover = undefined) {
+    Axios.get('playlistItems', {
       params: {
         part: 'snippet',
         maxResults: 50,
@@ -28,12 +28,12 @@ export default class Youtube {
     })
       .then(response => {
         response.data.items.map(item => {
-          this.playListTiems.push(item)
+          this.playlistItems.push(item)
         })
         if (response.data.nextPageToken) {
-          this.getPlaylistItems(playlistId, response.data.nextPageToken, title)
+          this.getPlaylistItems(playlistId, response.data.nextPageToken, title, cover)
         } else {
-          this.processPlaylist(this.playListTiems, title)
+          this.processPlaylist(this.playlistItems, title, cover)
         }
       })
       .catch(err => {
@@ -41,7 +41,17 @@ export default class Youtube {
       })
   }
 
-  processPlaylist(items, title) {
+  getPlaylistDetails(id) {
+    return Axios.get('playlists', {
+      params: {
+        part: 'snippet',
+        id: id,
+        key: API_KEY
+      }
+    })
+  }
+
+  processPlaylist(items, title, cover) {
     let songs = []
 
     items.map(item => {
@@ -53,6 +63,7 @@ export default class Youtube {
 
     const playlist = {
       title: title,
+      cover: cover,
       songs: songs
     }
 
@@ -62,6 +73,8 @@ export default class Youtube {
       db.playlists.toArray().then(lists => {
         store.commit('setPlaylists', lists)
       })
+
+      this.playlistItems = []
     })
   }
 

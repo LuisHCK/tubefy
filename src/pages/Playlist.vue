@@ -1,6 +1,9 @@
 <template>
   <div class="playlist-page">
-    <h1 class="title is-1">Playlist</h1>
+    <div class="playlist-header">
+      <h1 class="title is-1">Playlist</h1>
+      <div class="button is-info">Add Song</div>
+    </div>
     <div>
       <PlaylistContainer :items="playlist.songs"/>
     </div>
@@ -8,8 +11,9 @@
 </template>
 
 <script>
-import PlaylistContainer from '../components/player/PlaylistContainer'
-import { mapState } from 'vuex'
+import PlaylistContainer from "../components/player/PlaylistContainer";
+import db from "../database/";
+import { mapState } from "vuex";
 
 export default {
   computed: mapState({
@@ -23,25 +27,26 @@ export default {
   data() {
     return {
       playlist: {}
-    }
-  },
-
-  methods: {
-    getPlaylist(id) {
-      this.playlists.map(playlist => {
-        if (playlist.id == id) this.playlist = playlist
-      })
-    }
+    };
   },
 
   mounted() {
-    const id = this.$route.params.id
-    if (id) {
-      this.getPlaylist(id)
-    }
+    const id = Number(this.$route.params.id);
+    db.playlists.get(id).then(value => (this.playlist = value));
   }
 };
 </script>
 
-<style>
+<style scoped lang="scss">
+.playlist-header {
+  display: flex;
+  margin-left: 5px;
+  h1.title {
+    flex: 1;
+  }
+  .button {
+    margin-top: 8px;
+    justify-content: flex-end;
+  }
+}
 </style>

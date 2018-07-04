@@ -1,16 +1,9 @@
 <template>
   <footer class="footer player-component">
-
-    <a class="button flat" style="float: right" @click="hidePlayer=!hidePlayer">
-      <i class="material-icons">
-        {{hidePlayer? 'keyboard_arrow_up':'keyboard_arrow_down'}}
-      </i>
-    </a>
-
     <div :class="{'player-hiden': hidePlayer, 'player-container': true}">
       <youtube
         :player-vars="playerVars"
-        :video-id="currentSong.videoId"
+        :video-id="currentVideoId"
         width="auto"
         height="200px"
         ref="youtube"
@@ -19,39 +12,88 @@
         @ended="nextSong" />
     </div>
 
-    <progress class="progress is-warning" :value="progress" max="100"></progress>
+    <div class="center-controls">
+      <div class="stack-buttons">
+        <!-- Shuffle -->
+        <button class="button is-rounded is-outlined is-small">
+          <span class="icon">
+            <i class="icon ion-ios-shuffle"></i>
+          </span>
+        </button>
 
-    <div class="player-buttons">
+        <!-- Previous Song -->
+        <button class="button is-rounded is-outlined" @click="changeSong('prev')">
+          <span class="icon">
+            <i class="icon ion-ios-skip-backward"></i>
+          </span>
+        </button>
+
+        <!-- Play & Pause -->
+        <button class="button is-rounded is-is-outlined is-large" @click="pauseVideo()">
+          <span class="icon">
+            <i class="ion ion-ios-pause" v-if="isPlaying"></i>
+            <i class="ion ion-ios-play" v-else></i>
+          </span>
+        </button>
+
+        <!-- Next Song -->
+        <button class="button is-rounded is-outlined" @click="changeSong('next')">
+          <span class="icon">
+            <i class="icon ion-ios-skip-forward"></i>
+          </span>
+        </button>
+
+        <!-- Repeat -->
+        <button class="button is-rounded is-outlined is-small">
+          <span class="icon">
+            <i class="icon ion-ios-repeat"></i>
+          </span>
+        </button>
+
+
+      </div>
+    </div>
+
+    <!-- <a class="button flat" style="float: right" @click="hidePlayer=!hidePlayer">
+      <i class="material-icons">
+        {{hidePlayer? 'keyboard_arrow_up':'keyboard_arrow_down'}}
+      </i>
+    </a> -->
+
+    <!-- <progress class="progress is-warning" :value="progress" max="100"></progress> -->
+
+    <!-- <div class="player-buttons">
       <button class="button" @click="playVideo()">
         <i class="material-icons">play_arrow</i>
       </button>
       <button class="button" @click="pauseVideo()">
         <i class="material-icons">pause</i>
       </button>
-      <button class="button" @click="nextSong()">
+      <button class="button" @click="changeSong()">
         <i class="material-icons">skip_next</i>
       </button>
     </div>
 
     <div class="song-info">
       {{currentSong.title}}
-    </div>
+    </div> -->
 
   </footer>
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import db from '../../database/'
+import { mapState } from "vuex";
+import db from "../../database/";
 
 export default {
   computed: mapState({
     player() {
-      return this.$refs.youtube.player
+      return this.$refs.youtube.player;
     },
-    currentPlaylist: state => state.currentPlaylist,
     currentSong: state => state.currentSong,
-    currentSongIndex: state => state.currentSongIndex
+    queue: state => state.queue,
+    currentVideoId: state => state.currentVideoId,
+    settings: state => state.settings
   }),
 
   data() {
@@ -66,7 +108,7 @@ export default {
       processId: null,
       hidePlayer: true,
       isPlaying: false
-    }
+    };
   },
 
   methods: {
@@ -74,10 +116,10 @@ export default {
      * Reset vars and play the selected video
      */
     playVideo() {
-      this.duration = 0
-      this.progress = 0
-      this.isPlaying = true
-      this.player.playVideo()
+      this.duration = 0;
+      this.progress = 0;
+      this.isPlaying = true;
+      this.player.playVideo();
     },
 
     /**
@@ -85,87 +127,86 @@ export default {
      * set the interval of update of current time
      */
     async playing() {
-      let totalTime = await this.player.getDuration()
-
+      let totalTime = await this.player.getDuration();
       this.processId = setInterval(() => {
         this.player.getCurrentTime().then(time => {
-          let progress = time / totalTime * 100
-
-          this.progress = progress < 100 ? progress : 100
-          this.updateTime(time + 1)
-        })
-      }, 100)
+          let progress = time / totalTime * 100;
+          this.progress = progress < 100 ? progress : 100;
+          this.updateTime(time + 1);
+        });
+      }, 100);
+      this.isPlaying = true
     },
 
     /**
      * Get the current minute and second of video
      */
     updateTime(time) {
-      time = Math.round(time)
-      let minutes = Math.floor(time / 60)
-      let seconds = time - minutes * 60
+      time = Math.round(time);
+      let minutes = Math.floor(time / 60);
+      let seconds = time - minutes * 60;
+      seconds = seconds < 10 ? "0" + seconds : seconds;
+      minutes = minutes < 10 ? "0" + minutes : minutes;
+      this.time = minutes + ":" + seconds;
+    },
 
-      seconds = seconds < 10 ? '0' + seconds : seconds
-      minutes = minutes < 10 ? '0' + minutes : minutes
+    changeSong(action = "next") {
+      // Normal playler reproduction
+      if (this.settings.random) {
+        // Randomize
+        let nextSong = this.randomize(this.queue);
+        this.$store.commit("setCurrentVideoId", nextSong);
+      } else {
+        // Get list length
+        let listLength = this.queue.length;
+        // Get current Video index
+        let nextSong = undefined;
+        // Normal sequence
+        this.queue.map((item, index) => {
+          if (item === this.currentVideoId) {
+            if (listLength > index + 1) {
+              // play next song
+              if (action === "next") {
+                nextSong = index + 1;
 
-      this.time = minutes + ':' + seconds
+                // Play previous song
+              } else if (action === "prev" && index - 1 >= 0) {
+                nextSong = index - 1;
+              } else {
+                nextSong = 0;
+              }
+            }
+          } else {
+            nextSong = 0;
+          }
+        });
+        this.$store.commit("setCurrentVideoId", this.queue[nextSong]);
+      }
+    },
+
+    randomize(list = []) {
+      return list[Math.floor(Math.random() * list.length)];
     },
 
     pauseVideo() {
-      this.player.pauseVideo()
+      if (this.isPlaying) {
+        this.player.pauseVideo();
+      } else {
+        this.playVideo()
+      }
     },
 
     paused() {
-      this.isPlaying = false
-      clearInterval(this.processId)
-    },
-
-    /**
-     * Play next song when current ends
-     * or next button is pressed
-     */
-    nextSong() {
-      this.paused()
-      let song = this.currentPlaylist.songs[this.currentSongIndex + 1]
-      this.$store.commit('playSong', song)
-      // Update index
-      this.$store.commit('setCurrentSongIndex', this.currentSongIndex + 1)
-    },
-
-    /**
-     * Check if any currentPlaylist
-     */
-    checkCurrentPlaylist() {
-      db.playlists.toArray(dbPlaylists => {
-        // First check if theres one current playlist
-        if (this.currentPlaylist.length < 1) {
-          let last = dbPlaylists.length - 1
-          // If theres more than one playlist in db
-          // set the last as current
-          if (dbPlaylists.length >= 0) {
-            this.$store.commit('setCurrentPlaylist', dbPlaylists[last])
-          }
-        } else {
-          // If not, set the unique as current
-          if (dbPlaylists && dbPlaylists.length > 0)
-            this.$store.commit('setCurrentPlaylist', dbPlaylists[0])
-        }
-      })
+      this.isPlaying = false;
+      clearInterval(this.processId);
     }
-  },
-
-  mounted() {
-    console.log(this.currentSongIndex)
-    this.checkCurrentPlaylist()
-    // Some settings over player
-    this.player.setPlaybackQuality('small')
   }
-}
+};
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 footer {
-  padding: 1rem 1.5rem 2rem !important;
+  padding: 1rem 1.5rem 1.5rem !important;
   position: fixed;
   left: 0;
   bottom: 0;
@@ -179,8 +220,18 @@ footer {
   display: none;
 }
 
-.player-buttons,
-.song-info {
-  text-align: center;
+.center-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .stack-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    button {
+      margin: 5px;
+    }
+  }
 }
 </style>
