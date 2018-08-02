@@ -51,6 +51,19 @@ export default class Youtube {
     })
   }
 
+  /**
+   * Get video Details
+   */
+  static getVideoDetails(id) {
+    return Axios.get('videos', {
+      params: {
+        part: 'snippet',
+        id: id,
+        key: API_KEY
+      }
+    })
+  }
+
   processPlaylist(items, title, cover) {
     let songs = []
 
