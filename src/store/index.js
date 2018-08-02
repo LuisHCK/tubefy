@@ -18,17 +18,19 @@ const state = {
   currentVideoId: undefined,
   settings: {
     random: false
-  }
+  },
+  prevSongIndex: 0
 }
 
 const getters = {
   playlists: state => state.playlists,
   currentPlaylist: state => state.currentPlaylist,
-  currentSong: state => state.currentSong,
   currentSongIndex: state => state.currentSongIndex,
   showNav: state => state.showNav,
+  currentSong: state => state.currentSong,
   queue: state => state.queue,
-  currentVideoId: state => state.currentVideoId
+  currentVideoId: state => state.currentVideoId,
+  prevSongIndex: state => state.prevSongIndex
 }
 
 const mutations = {
@@ -52,6 +54,10 @@ const mutations = {
     state.currentSongIndex = index
   },
 
+  setCurrentSongInfo(state, song) {
+    state.currentSong = song
+  },
+
   toggleNav(state) {
     state.showNav = ! state.showNav
   },
@@ -62,6 +68,10 @@ const mutations = {
 
   setCurrentVideoId(state, id) {
     state.currentVideoId = id
+  },
+
+  setPrevSongIndex(state, index) {
+    state.prevSongIndex = index
   }
 }
 

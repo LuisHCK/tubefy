@@ -1,7 +1,7 @@
 <template>
   <div class="playlist-page">
     <div class="playlist-header">
-      <h1 class="title is-1">Playlist</h1>
+      <h1 class="title is-1">{{playlist.title}}</h1>
       <div class="button is-info">Add Song</div>
     </div>
     <div>

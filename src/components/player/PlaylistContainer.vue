@@ -2,9 +2,10 @@
   <div class="playlist-container">
     <ul class="playlist-song-list">
       <li class="playlist-song"
-      v-for="(item, index) in items" :key="index"
-      :class="{selected: currentVideoId == item.videoId}"
-      @click="selectSong(item)">
+        v-for="(item, index) in items" :key="index"
+        :class="{selected: currentVideoId == item.videoId}"
+        @click="selectSong(item)">
+
         <span class="icon has-text-info">
           <i class="icon ion-md-play" v-if="currentVideoId == item.videoId"></i>
           <i class="icon ion-md-musical-notes" v-else></i>
@@ -29,8 +30,10 @@ export default {
 
   methods: {
     selectSong(song) {
-      // Set song
+      // Set song Id
       this.$store.commit('setCurrentVideoId', song.videoId);
+      // Set song object
+      this.$store.commit('setCurrentSongInfo', song)
       this.setQueue()
     },
 
@@ -50,7 +53,7 @@ export default {
 <style scoped lang="scss">
 .playlist-container {
   overflow-y: scroll;
-  height: 50vh;
+  height: 60vh;
 }
 .playlist-song-list {
   li.playlist-song {

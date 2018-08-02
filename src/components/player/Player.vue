@@ -9,7 +9,11 @@
         ref="youtube"
         @paused="paused"
         @playing="playing"
-        @ended="nextSong" />
+        @ended="changeSong('next')" />
+    </div>
+
+    <div class="center-controls">
+      <b>{{ currentSong.title }}</b>
     </div>
 
     <div class="center-controls">
@@ -49,51 +53,26 @@
             <i class="icon ion-ios-repeat"></i>
           </span>
         </button>
-
-
       </div>
     </div>
-
-    <!-- <a class="button flat" style="float: right" @click="hidePlayer=!hidePlayer">
-      <i class="material-icons">
-        {{hidePlayer? 'keyboard_arrow_up':'keyboard_arrow_down'}}
-      </i>
-    </a> -->
-
-    <!-- <progress class="progress is-warning" :value="progress" max="100"></progress> -->
-
-    <!-- <div class="player-buttons">
-      <button class="button" @click="playVideo()">
-        <i class="material-icons">play_arrow</i>
-      </button>
-      <button class="button" @click="pauseVideo()">
-        <i class="material-icons">pause</i>
-      </button>
-      <button class="button" @click="changeSong()">
-        <i class="material-icons">skip_next</i>
-      </button>
-    </div>
-
-    <div class="song-info">
-      {{currentSong.title}}
-    </div> -->
-
   </footer>
 </template>
 
 <script>
-import { mapState } from "vuex";
-import db from "../../database/";
+import { mapState } from 'vuex'
+import db from '../../database/'
 
 export default {
   computed: mapState({
     player() {
-      return this.$refs.youtube.player;
+      return this.$refs.youtube.player
     },
     currentSong: state => state.currentSong,
     queue: state => state.queue,
     currentVideoId: state => state.currentVideoId,
-    settings: state => state.settings
+    settings: state => state.settings,
+    prevSongIndex: state => state.prevSongIndex,
+    currentPlaylist: state => state.currentPlaylist
   }),
 
   data() {
@@ -108,7 +87,7 @@ export default {
       processId: null,
       hidePlayer: true,
       isPlaying: false
-    };
+    }
   },
 
   methods: {
@@ -116,10 +95,10 @@ export default {
      * Reset vars and play the selected video
      */
     playVideo() {
-      this.duration = 0;
-      this.progress = 0;
-      this.isPlaying = true;
-      this.player.playVideo();
+      this.duration = 0
+      this.progress = 0
+      this.isPlaying = true
+      this.player.playVideo()
     },
 
     /**
@@ -127,14 +106,14 @@ export default {
      * set the interval of update of current time
      */
     async playing() {
-      let totalTime = await this.player.getDuration();
+      let totalTime = await this.player.getDuration()
       this.processId = setInterval(() => {
         this.player.getCurrentTime().then(time => {
-          let progress = time / totalTime * 100;
-          this.progress = progress < 100 ? progress : 100;
-          this.updateTime(time + 1);
-        });
-      }, 100);
+          let progress = time / totalTime * 100
+          this.progress = progress < 100 ? progress : 100
+          this.updateTime(time + 1)
+        })
+      }, 100)
       this.isPlaying = true
     },
 
@@ -142,66 +121,92 @@ export default {
      * Get the current minute and second of video
      */
     updateTime(time) {
-      time = Math.round(time);
-      let minutes = Math.floor(time / 60);
-      let seconds = time - minutes * 60;
-      seconds = seconds < 10 ? "0" + seconds : seconds;
-      minutes = minutes < 10 ? "0" + minutes : minutes;
-      this.time = minutes + ":" + seconds;
+      time = Math.round(time)
+      let minutes = Math.floor(time / 60)
+      let seconds = time - minutes * 60
+      seconds = seconds < 10 ? '0' + seconds : seconds
+      minutes = minutes < 10 ? '0' + minutes : minutes
+      this.time = minutes + ':' + seconds
     },
 
-    changeSong(action = "next") {
+    changeSong(action = 'next') {
       // Normal playler reproduction
       if (this.settings.random) {
         // Randomize
-        let nextSong = this.randomize(this.queue);
-        this.$store.commit("setCurrentVideoId", nextSong);
+        let nextSong = this.randomize(this.queue)
+        this.$store.commit('setCurrentVideoId', nextSong)
       } else {
         // Get list length
-        let listLength = this.queue.length;
-        // Get current Video index
-        let nextSong = undefined;
+        let listLength = this.queue.length
+        // Current Song Index
+        let currentSongIndex = 0
         // Normal sequence
         this.queue.map((item, index) => {
-          if (item === this.currentVideoId) {
-            if (listLength > index + 1) {
-              // play next song
-              if (action === "next") {
-                nextSong = index + 1;
+          if (item == this.currentVideoId) currentSongIndex = index
+        })
 
-                // Play previous song
-              } else if (action === "prev" && index - 1 >= 0) {
-                nextSong = index - 1;
-              } else {
-                nextSong = 0;
-              }
-            }
-          } else {
-            nextSong = 0;
-          }
-        });
-        this.$store.commit("setCurrentVideoId", this.queue[nextSong]);
+        switch (action) {
+          case 'next':
+            this.playNext(currentSongIndex)
+            break
+
+          case 'prev':
+            this.playPrev(currentSongIndex)
+            break
+
+          default:
+            this.$store.commit('setCurrentVideoId', this.getSongIdByIndex(0))
+            break
+        }
+      }
+    },
+
+    /**
+     * Play the next song, and preserve registry of previous soong
+     */
+    playNext(currentIndex) {
+      this.$store.commit('setPrevSongIndex', currentIndex)
+      this.$store.commit(
+        'setCurrentVideoId',
+        this.getSongIdByIndex(currentIndex + 1)
+      )
+    },
+
+    /**
+     * Play previous song of index
+     */
+    playPrev(currentIndex) {
+      // If not the first song
+      if (currentIndex > 0) {
+        this.$store.commit(
+          'setCurrentVideoId',
+          this.getSongIdByIndex(currentIndex - 1)
+        )
       }
     },
 
     randomize(list = []) {
-      return list[Math.floor(Math.random() * list.length)];
+      return list[Math.floor(Math.random() * list.length)]
     },
 
     pauseVideo() {
       if (this.isPlaying) {
-        this.player.pauseVideo();
+        this.player.pauseVideo()
       } else {
         this.playVideo()
       }
     },
 
     paused() {
-      this.isPlaying = false;
-      clearInterval(this.processId);
+      this.isPlaying = false
+      clearInterval(this.processId)
+    },
+
+    getSongIdByIndex(index) {
+      return this.queue[index]
     }
   }
-};
+}
 </script>
 
 <style scoped lang="scss">

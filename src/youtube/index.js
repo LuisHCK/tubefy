@@ -2,7 +2,7 @@ import axios from 'axios'
 import db from '../database/'
 import store from '../store/'
 
-const API_KEY = 'AIzaSyAJ1-y_cXzOzjWUUFYRBur1kA-0JNQQias'
+const API_KEY = 'AIzaSyBYDdZj7ogQy8mkMAnboFPNeyjwkFNiUtQ'
 
 const Axios = axios.create({
   baseURL: 'https://www.googleapis.com/youtube/v3/',
