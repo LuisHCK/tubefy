@@ -24,7 +24,7 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 - [x] Youtube Playlist Import by URL
 - [x] Store playlists on IndexedDB
 - [ ] Volume Controls
-- [ ] Single video Import
+- [x] Single video Import
 - [ ] Document JS code
 - [ ] Better UI Responsiveness
 - [ ] Local Notifications
